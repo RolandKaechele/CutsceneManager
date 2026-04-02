@@ -3,7 +3,6 @@
 A lightweight, data-driven cutscene framework for Unity.  
 Sequences are defined in plain JSON, played back step-by-step at runtime, and optionally integrated with [MapLoaderFramework](https://github.com/RolandKaechele/MapLoaderFramework) for seamless map/chapter transitions.
 
----
 
 ## Features
 
@@ -16,7 +15,6 @@ Sequences are defined in plain JSON, played back step-by-step at runtime, and op
 - **Custom Inspector** — play, stop, and reload sequences from the Unity Editor
 - **Modular architecture** — each controller (fade, name card, subtitle) is a standalone component; use only what you need
 
----
 
 ## Installation
 
@@ -25,6 +23,7 @@ Sequences are defined in plain JSON, played back step-by-step at runtime, and op
 1. Open **Window → Package Manager**
 2. Click **+** → **Add package from git URL…**
 3. Enter:
+
    ```
    https://github.com/RolandKaechele/CutsceneManager.git
    ```
@@ -39,7 +38,6 @@ git clone https://github.com/RolandKaechele/CutsceneManager.git Assets/CutsceneM
 
 Copy the `CutsceneManager/` folder into your project's `Assets/` directory.
 
----
 
 ## Folder Structure
 
@@ -54,7 +52,6 @@ Scripts/           ← Lua scripts referenced by TriggerLua steps
 
 Example sequences are copied from `CutsceneManager/Examples/Cutscenes/` into `Resources/Cutscenes/`.
 
----
 
 ## Quick Start
 
@@ -63,7 +60,7 @@ Example sequences are copied from `CutsceneManager/Examples/Cutscenes/` into `Re
 Create an empty GameObject, add the `CutsceneManager` component, then attach:
 
 | Component | Purpose |
-|-----------|---------|
+| --------- | ------- |
 | `CutsceneManager` | Main orchestrator (required) |
 | `FadeController` | Screen fade — needs a full-screen `Image` |
 | `NameCardController` | Chapter/location name card UI |
@@ -102,19 +99,18 @@ manager.PlaySequence("my_intro");
 Add `CutsceneTrigger` to any GameObject and set:
 
 | Field | Value |
-|-------|-------|
+| ----- | ----- |
 | Sequence Id | `my_intro` |
 | Trigger Mode | `OnStart` / `OnTriggerEnter` / `OnInteract` |
 | Play Once | ✓ |
 
----
 
 ## Step Type Reference
 
 All 14 step types and the JSON properties each reads:
 
 | Value | Name | Properties used |
-|------:|------|----------------|
+| ----- | ---- | --------------- |
 | 0 | `Fade` | `duration`, `fadeColor` |
 | 1 | `Wait` | `duration`, `waitForInput` |
 | 2 | `ShowImage` | `imageResource`, `duration`, `waitForInput` |
@@ -133,7 +129,7 @@ All 14 step types and the JSON properties each reads:
 ### Common Step Properties
 
 | Property | Type | Description |
-|----------|------|-------------|
+| -------- | ---- | ----------- |
 | `stepType` | int | Step type value (see table above) |
 | `duration` | float | Duration in seconds (0 = instant or indefinite) |
 | `waitForInput` | bool | Pause until the player presses the confirm key |
@@ -149,7 +145,6 @@ All 14 step types and the JSON properties each reads:
 | `shakeMagnitude` | float | Shake intensity for `CameraShake` |
 | `customEvent` | string | Event name broadcast via `OnCustomEvent` |
 
----
 
 ## MapLoaderFramework Integration
 
@@ -166,6 +161,7 @@ Add the `MapLoaderBridge` component to the same (or any) GameObject.
 It automatically finds `MapLoaderManager` and `FadeController` in the scene and hooks into `MapLoaderFramework.TransitionCallback`.
 
 From that point:
+
 - Every map/chapter load triggered by MapLoaderFramework will fade out → load → fade in via `FadeController`
 - `TriggerMapLoad` and `TriggerChapter` cutscene steps will call MapLoaderFramework directly
 
@@ -177,14 +173,13 @@ bridge.LoadMap("my_map_id");
 bridge.LoadChapter(3);
 ```
 
----
 
 ## Runtime API
 
 ### `CutsceneManager`
 
 | Member | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `PlaySequence(string id)` | Play a loaded sequence by ID |
 | `PlaySequence(CutsceneSequenceData)` | Play a sequence object directly |
 | `StopSequence()` | Interrupt the active sequence |
@@ -196,11 +191,13 @@ bridge.LoadChapter(3);
 | `OnSequenceCompleted` | `UnityEvent<string>` — fires when a sequence ends normally |
 | `OnSequenceSkipped` | `UnityEvent<string>` — fires when the player skips |
 | `OnCustomEvent` | `UnityEvent<string>` — fires on `Custom` steps |
+| `PlayAudioCallback` | `Action<string, bool>` delegate — override audio playback for `PlayAudio` steps |
+| `StopAudioCallback` | `Action` delegate — override audio stop for `StopAudio` steps |
 
 ### `CutsceneTrigger`
 
 | Member | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `Trigger()` | Fire the sequence from code or UI |
 | `sequenceId` | ID of the sequence to play |
 | `triggerMode` | `OnStart` / `OnTriggerEnter` / `OnInteract` |
@@ -209,7 +206,7 @@ bridge.LoadChapter(3);
 ### `FadeController`
 
 | Member | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `FadeOut(duration, onComplete)` | Fade to opaque |
 | `FadeIn(duration, onComplete)` | Fade to transparent |
 | `FadeOutAndIn(onMiddle, outDuration, inDuration, onComplete)` | Full fade cycle |
@@ -219,7 +216,7 @@ bridge.LoadChapter(3);
 ### `NameCardController`
 
 | Member | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `Show(title, subtitle)` | Display the name card |
 | `Hide()` | Hide the name card |
 | `IsVisible` | True when the card is shown |
@@ -227,7 +224,7 @@ bridge.LoadChapter(3);
 ### `SubtitleController`
 
 | Member | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `Show(text)` | Display subtitle text |
 | `Hide()` | Hide subtitle text |
 | `IsVisible` | True when subtitle is shown |
@@ -235,11 +232,31 @@ bridge.LoadChapter(3);
 ### `MapLoaderBridge` *(requires `CUTSCENEMANAGER_MLF`)*
 
 | Member | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `LoadMap(string mapId)` | Load a map through MapLoaderFramework |
 | `LoadChapter(int chapterId)` | Load a chapter through MapLoaderFramework |
 
----
+
+## AudioManager Integration
+
+CutsceneManager exposes two delegate hooks so an external audio system can handle `PlayAudio` and `StopAudio` steps through its own mixer, with volume scaling and channel routing.
+
+### Enable
+
+1. Install [AudioManager](https://github.com/RolandKaechele/AudioManager)
+2. Add `AUDIOMANAGER_CSM` to **Edit → Project Settings → Player → Scripting Define Symbols**
+3. Attach `CutsceneAudioBridge` to any GameObject in your scene
+
+`CutsceneAudioBridge.Awake()` wires `PlayAudioCallback` and `StopAudioCallback` automatically. Without the bridge, CutsceneManager falls back to its built-in raw `AudioSource`.
+
+You can also wire the delegates manually:
+
+```csharp
+var mgr = FindObjectOfType<CutsceneManager.Runtime.CutsceneManager>();
+mgr.PlayAudioCallback = (resource, loop) => myAudio.PlayMusic(resource);
+mgr.StopAudioCallback = () => myAudio.StopMusic();
+```
+
 
 ## Custom Events
 
@@ -253,30 +270,27 @@ mgr.OnCustomEvent.AddListener(evt =>
 });
 ```
 
----
 
 ## Examples
 
 The `Examples/` folder contains ready-to-run sequences:
 
 | File | Description |
-|------|-------------|
+| ---- | ----------- |
 | `Cutscenes/example_chapter01_intro.json` | Chapter intro — fade, splash image, name card, subtitle, chapter load |
 | `Cutscenes/example_location_transition.json` | Location warp — fade, ambient audio, name card, map load |
 | `Scripts/example_cutscene_trigger.lua` | Lua script called by a `TriggerLua` step |
 
----
 
 ## Dependencies
 
 | Dependency | Required | Notes |
-|------------|----------|-------|
+| ---------- | -------- | ----- |
 | Unity 2022.3+ | ✓ | |
 | TextMeshPro | optional | Used by `NameCardController` / `SubtitleController` if present |
 | MapLoaderFramework | optional | Required only when `CUTSCENEMANAGER_MLF` is defined |
 | MoonSharp | optional | Required for `TriggerLua` steps (included in MapLoaderFramework) |
 
----
 
 ## License
 

@@ -52,6 +52,24 @@ namespace CutsceneManager.Runtime
         [SerializeField] private List<string> loadedSequenceIds = new List<string>();
 
         // -------------------------------------------------------------------------
+        // Audio delegate hooks (set by CutsceneAudioBridge when AudioManager is present)
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Optional callback that handles <see cref="CutsceneStepType.PlayAudio"/> steps.
+        /// Signature: (resourcePath, loop). When set, the built-in AudioSource fallback is bypassed.
+        /// Set automatically by <c>AudioManager.Runtime.CutsceneAudioBridge</c>.
+        /// </summary>
+        public Action<string, bool> PlayAudioCallback;
+
+        /// <summary>
+        /// Optional callback that handles <see cref="CutsceneStepType.StopAudio"/> steps.
+        /// When set, the built-in AudioSource stop is bypassed.
+        /// Set automatically by <c>AudioManager.Runtime.CutsceneAudioBridge</c>.
+        /// </summary>
+        public Action StopAudioCallback;
+
+        // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
 
@@ -379,6 +397,15 @@ namespace CutsceneManager.Runtime
         private void HandlePlayAudio(CutsceneStep step)
         {
             if (string.IsNullOrEmpty(step.audioResource)) return;
+
+            // Delegate to AudioManager bridge if available
+            if (PlayAudioCallback != null)
+            {
+                PlayAudioCallback(step.audioResource, step.audioLoop);
+                return;
+            }
+
+            // Built-in fallback: play via a local AudioSource
             var clip = Resources.Load<AudioClip>(step.audioResource);
             if (clip == null)
             {
@@ -393,6 +420,10 @@ namespace CutsceneManager.Runtime
 
         private void HandleStopAudio()
         {
+            // Delegate to AudioManager bridge if available
+            if (StopAudioCallback != null) { StopAudioCallback(); return; }
+
+            // Built-in fallback
             if (_audioSource != null) _audioSource.Stop();
         }
 
