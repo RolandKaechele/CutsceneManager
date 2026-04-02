@@ -1,0 +1,42 @@
+{
+  "id": "chapter_01_intro",
+  "title": "Chapter 1 — The Beginning",
+  "skipAllowed": true,
+  "steps": [
+    {
+      "stepType": 0,
+      "fadeColor": "black",
+      "duration": 0.4
+    },
+    {
+      "stepType": 2,
+      "imageResource": "Cutscenes/chapter01_splash",
+      "duration": 0
+    },
+    {
+      "stepType": 6,
+      "text": "Chapter 1",
+      "duration": 1.5
+    },
+    {
+      "stepType": 4,
+      "text": "The city was quiet... until they arrived.",
+      "duration": 3.0
+    },
+    {
+      "stepType": 5
+    },
+    {
+      "stepType": 3
+    },
+    {
+      "stepType": 9,
+      "chapterId": 1
+    },
+    {
+      "stepType": 0,
+      "fadeColor": "clear",
+      "duration": 0.5
+    }
+  ]
+}

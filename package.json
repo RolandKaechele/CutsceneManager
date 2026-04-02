@@ -1,0 +1,30 @@
+{
+  "name": "com.rolandkaechele.cutscenemanager",
+  "displayName": "Cutscene Manager",
+  "version": "1.0.0",
+  "unity": "2022.3",
+  "description": "A modular Unity cutscene framework supporting fade transitions, name cards, subtitles, image slides, audio, camera shake, and optional MapLoaderFramework integration.",
+  "author": {
+    "name": "Roland Kaechele",
+    "url": "https://github.com/RolandKaechele/CutsceneManager"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RolandKaechele/CutsceneManager.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "unity",
+    "cutscene",
+    "fade",
+    "transition",
+    "sequence",
+    "2d",
+    "rpg",
+    "framework"
+  ],
+  "documentationUrl": "https://github.com/RolandKaechele/CutsceneManager#readme",
+  "scripts": {
+    "postinstall": "node postinstall.js"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "location_transition",
+  "title": "Location Transition",
+  "skipAllowed": false,
+  "steps": [
+    {
+      "stepType": 0,
+      "fadeColor": "black",
+      "duration": 0.3
+    },
+    {
+      "stepType": 7,
+      "audioResource": "Audio/SFX/transition_sting",
+      "audioLoop": false
+    },
+    {
+      "stepType": 6,
+      "text": "The Old Lighthouse",
+      "duration": 1.2
+    },
+    {
+      "stepType": 8,
+      "mapId": "lighthouse_exterior"
+    },
+    {
+      "stepType": 0,
+      "fadeColor": "clear",
+      "duration": 0.4
+    }
+  ]
+}
