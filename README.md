@@ -11,6 +11,8 @@ Sequences are defined in plain JSON, played back step-by-step at runtime, and op
 - **Runtime hot-loading** — sequences in `persistentDataPath/Cutscenes/` are loaded at startup alongside bundled `Resources/Cutscenes/` files
 - **Skip support** — per-sequence `skipAllowed` flag; skip key is configurable (default: Escape)
 - **MapLoaderFramework integration** — optional bridge hooks the framework's `TransitionCallback` so fade transitions apply on every map/chapter load (activated via a scripting define)
+- **SaveManager integration** — `SaveCutsceneBridge` records seen sequences as save flags to prevent repeated first-play cutscenes (activated via `CUTSCENEMANAGER_SM`)
+- **InventoryManager integration** — `InventoryCutsceneBridge` interprets `Custom` step payloads as inventory commands to add, remove, or use items during a cutscene (activated via `CUTSCENEMANAGER_IM`)
 - **Lua trigger step** — run named Lua scripts during a sequence (requires MapLoaderFramework with MoonSharp)
 - **Custom Inspector** — play, stop, and reload sequences from the Unity Editor
 - **Modular architecture** — each controller (fade, name card, subtitle) is a standalone component; use only what you need
@@ -236,6 +238,17 @@ bridge.LoadChapter(3);
 | `LoadMap(string mapId)` | Load a map through MapLoaderFramework |
 | `LoadChapter(int chapterId)` | Load a chapter through MapLoaderFramework |
 
+### `SaveCutsceneBridge` *(requires `CUTSCENEMANAGER_SM`)*
+
+| Member | Description |
+| ------ | ----------- |
+| `HasSeen(string sequenceId) → bool` | Returns true if the sequence has been recorded as seen |
+| `flagPrefix` | Inspector — prefix prepended to sequence ID (default: `"cutscene_seen_"`) |
+
+### `InventoryCutsceneBridge` *(requires `CUTSCENEMANAGER_IM`)*
+
+Subscribes to `OnCustomEvent` and dispatches payloads matching the verb prefixes to `InventoryManager.AddItem`, `RemoveItem`, or `UseItem`. All verb prefixes are configurable in the Inspector.
+
 
 ## AudioManager Integration
 
@@ -255,6 +268,64 @@ You can also wire the delegates manually:
 var mgr = FindObjectOfType<CutsceneManager.Runtime.CutsceneManager>();
 mgr.PlayAudioCallback = (resource, loop) => myAudio.PlayMusic(resource);
 mgr.StopAudioCallback = () => myAudio.StopMusic();
+```
+
+
+## SaveManager Integration
+
+CutsceneManager can record which sequences have been seen in **SaveManager** so first-play cutscenes do not repeat after loading a save.
+
+### Enable
+
+1. Add `CUTSCENEMANAGER_SM` to **Scripting Define Symbols**
+2. Attach `SaveCutsceneBridge` to any GameObject in your scene.
+
+`SaveCutsceneBridge` subscribes to `OnSequenceCompleted` and `OnSequenceSkipped`. When either fires it calls `SaveManager.SetFlag("{flagPrefix}{sequenceId}")` (default prefix: `"cutscene_seen_"`).
+
+```csharp
+var bridge = FindFirstObjectByType<SaveCutsceneBridge>();
+if (!bridge.HasSeen("intro_chapter_01"))
+    cutsceneManager.PlaySequence("intro_chapter_01");
+```
+
+### Inspector Fields
+
+| Field | Default | Description |
+| ----- | ------- | ----------- |
+| `Flag Prefix` | `"cutscene_seen_"` | Prepended to the sequence ID when writing the seen flag |
+
+
+## InventoryManager Integration
+
+CutsceneManager can modify the player's inventory during a sequence using `Custom` step payloads.
+
+### Enable
+
+1. Add `CUTSCENEMANAGER_IM` to **Scripting Define Symbols**
+2. Attach `InventoryCutsceneBridge` to any GameObject in your scene.
+
+`InventoryCutsceneBridge` listens to `OnCustomEvent`. Payloads matching the configured verbs are dispatched to `InventoryManager`:
+
+| Payload format | Effect |
+| -------------- | ------ |
+| `"inventory.add:sword"` | Adds 1 unit of `sword` |
+| `"inventory.add:sword:3"` | Adds 3 units of `sword` |
+| `"inventory.remove:sword"` | Removes 1 unit of `sword` |
+| `"inventory.remove:sword:3"` | Removes 3 units |
+| `"inventory.use:sword"` | Calls `InventoryManager.UseItem("sword")` |
+
+### Inspector Fields
+
+| Field | Default | Description |
+| ----- | ------- | ----------- |
+| `Add Verb` | `"inventory.add"` | Payload prefix for granting items |
+| `Remove Verb` | `"inventory.remove"` | Payload prefix for removing items |
+| `Use Verb` | `"inventory.use"` | Payload prefix for using items |
+
+### Example sequence step
+
+```json
+{ "stepType": 13, "customEvent": "inventory.add:key_reactor_room" }
 ```
 
 
@@ -290,6 +361,8 @@ The `Examples/` folder contains ready-to-run sequences:
 | TextMeshPro | optional | Used by `NameCardController` / `SubtitleController` if present |
 | MapLoaderFramework | optional | Required only when `CUTSCENEMANAGER_MLF` is defined |
 | MoonSharp | optional | Required for `TriggerLua` steps (included in MapLoaderFramework) |
+| SaveManager | optional | Required when `CUTSCENEMANAGER_SM` is defined |
+| InventoryManager | optional | Required when `CUTSCENEMANAGER_IM` is defined |
 
 
 ## License
