@@ -13,6 +13,7 @@ Sequences are defined in plain JSON, played back step-by-step at runtime, and op
 - **MapLoaderFramework integration** — optional bridge hooks the framework's `TransitionCallback` so fade transitions apply on every map/chapter load (activated via a scripting define)
 - **SaveManager integration** — `SaveCutsceneBridge` records seen sequences as save flags to prevent repeated first-play cutscenes (activated via `CUTSCENEMANAGER_SM`)
 - **InventoryManager integration** — `InventoryCutsceneBridge` interprets `Custom` step payloads as inventory commands to add, remove, or use items during a cutscene (activated via `CUTSCENEMANAGER_IM`)
+- **MiniGameManager integration** — `MiniGameCutsceneBridge` plays cutscene sequences automatically when a mini-game starts, completes, or is aborted (activated via `CUTSCENEMANAGER_MGM`)
 - **Lua trigger step** — run named Lua scripts during a sequence (requires MapLoaderFramework with MoonSharp)
 - **Custom Inspector** — play, stop, and reload sequences from the Unity Editor
 - **Modular architecture** — each controller (fade, name card, subtitle) is a standalone component; use only what you need
@@ -249,6 +250,16 @@ bridge.LoadChapter(3);
 
 Subscribes to `OnCustomEvent` and dispatches payloads matching the verb prefixes to `InventoryManager.AddItem`, `RemoveItem`, or `UseItem`. All verb prefixes are configurable in the Inspector.
 
+### `MiniGameCutsceneBridge` *(requires `CUTSCENEMANAGER_MGM`)*
+
+Listens to `MiniGameManager.OnMiniGameStarted`, `OnMiniGameCompleted`, and `OnMiniGameAborted`. When any event fires, it derives a cutscene sequence id by appending a configurable suffix to the mini-game id and plays it if it exists.
+
+| Inspector Field | Default | Description |
+| --------------- | ------- | ----------- |
+| `Start Suffix` | `"_start"` | e.g. `puzzle_01_start` plays when mini-game `puzzle_01` starts |
+| `Complete Suffix` | `"_complete"` | e.g. `puzzle_01_complete` plays on completion |
+| `Abort Suffix` | `"_abort"` | e.g. `puzzle_01_abort` plays on abort |
+
 
 ## AudioManager Integration
 
@@ -363,6 +374,7 @@ The `Examples/` folder contains ready-to-run sequences:
 | MoonSharp | optional | Required for `TriggerLua` steps (included in MapLoaderFramework) |
 | SaveManager | optional | Required when `CUTSCENEMANAGER_SM` is defined |
 | InventoryManager | optional | Required when `CUTSCENEMANAGER_IM` is defined |
+| MiniGameManager | optional | Required when `CUTSCENEMANAGER_MGM` is defined |
 
 
 ## License
