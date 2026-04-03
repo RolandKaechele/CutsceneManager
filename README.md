@@ -93,7 +93,7 @@ Place a `.json` file in `Resources/Cutscenes/` (or `Cutscenes/` for runtime load
 ### 3. Play from code
 
 ```csharp
-CutsceneManager manager = FindObjectOfType<CutsceneManager>();
+CutsceneManager manager = FindFirstObjectByType<CutsceneManager>();
 manager.PlaySequence("my_intro");
 ```
 
@@ -171,7 +171,7 @@ From that point:
 ### Call from code
 
 ```csharp
-MapLoaderBridge bridge = FindObjectOfType<MapLoaderBridge>();
+MapLoaderBridge bridge = FindFirstObjectByType<MapLoaderBridge>();
 bridge.LoadMap("my_map_id");
 bridge.LoadChapter(3);
 ```
@@ -276,7 +276,7 @@ CutsceneManager exposes two delegate hooks so an external audio system can handl
 You can also wire the delegates manually:
 
 ```csharp
-var mgr = FindObjectOfType<CutsceneManager.Runtime.CutsceneManager>();
+var mgr = FindFirstObjectByType<CutsceneManager.Runtime.CutsceneManager>();
 mgr.PlayAudioCallback = (resource, loop) => myAudio.PlayMusic(resource);
 mgr.StopAudioCallback = () => myAudio.StopMusic();
 ```
@@ -345,7 +345,7 @@ CutsceneManager can modify the player's inventory during a sequence using `Custo
 Listen to named custom events from `CutsceneManager.OnCustomEvent`:
 
 ```csharp
-var mgr = FindObjectOfType<CutsceneManager.Runtime.CutsceneManager>();
+var mgr = FindFirstObjectByType<CutsceneManager.Runtime.CutsceneManager>();
 mgr.OnCustomEvent.AddListener(evt =>
 {
     if (evt == "spawn_enemy") SpawnEnemy();
