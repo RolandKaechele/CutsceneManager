@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace CutsceneManager.Runtime
 {
@@ -27,7 +30,11 @@ namespace CutsceneManager.Runtime
     /// </summary>
     [AddComponentMenu("CutsceneManager/Cutscene Manager")]
     [DisallowMultipleComponent]
+#if ODIN_INSPECTOR
+    public class CutsceneManager : SerializedMonoBehaviour
+#else
     public class CutsceneManager : MonoBehaviour
+#endif
     {
         // -------------------------------------------------------------------------
         // Inspector
@@ -49,6 +56,9 @@ namespace CutsceneManager.Runtime
         [SerializeField] private KeyCode confirmKey = KeyCode.Space;
 
         [Header("Loaded sequences (read-only, set at runtime)")]
+#if ODIN_INSPECTOR
+        [ReadOnly]
+#endif
         [SerializeField] private List<string> loadedSequenceIds = new List<string>();
 
         // -------------------------------------------------------------------------
