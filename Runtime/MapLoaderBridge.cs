@@ -1,4 +1,6 @@
+#if CUTSCENEMANAGER_MLF
 using System;
+using MapLoaderFramework.Runtime;
 using UnityEngine;
 
 namespace CutsceneManager.Runtime
@@ -19,26 +21,18 @@ namespace CutsceneManager.Runtime
     /// fade-out/fade-in if a <see cref="FadeController"/> is present in the scene.</item>
     /// </list>
     /// </para>
-    /// <para>
-    /// Without the scripting symbol this component compiles as a no-op stub — safe to leave in
-    /// the scene without MLF installed.
-    /// </para>
     /// </summary>
     [AddComponentMenu("CutsceneManager/Map Loader Bridge")]
     [DisallowMultipleComponent]
     public class MapLoaderBridge : MonoBehaviour
     {
-#if CUTSCENEMANAGER_MLF
-        private MapLoaderFramework.Runtime.MapLoaderManager _manager;
+        private MapLoaderManager _manager;
         private FadeController _fade;
 
         private void Awake()
         {
-            _manager = GetComponent<MapLoaderFramework.Runtime.MapLoaderManager>()
-                       ?? FindObjectOfType<MapLoaderFramework.Runtime.MapLoaderManager>();
-
-            _fade = FindObjectOfType<FadeController>();
-
+            _manager = GetComponent<MapLoaderManager>() ?? FindObjectOfType<MapLoaderManager>();
+            _fade    = FindObjectOfType<FadeController>();
             HookTransitionCallback();
         }
 
@@ -48,8 +42,7 @@ namespace CutsceneManager.Runtime
         /// </summary>
         private void HookTransitionCallback()
         {
-            var framework = GetComponent<MapLoaderFramework.Runtime.MapLoaderFramework>()
-                            ?? FindObjectOfType<MapLoaderFramework.Runtime.MapLoaderFramework>();
+            var framework = GetComponent<MapLoaderFramework>() ?? FindObjectOfType<MapLoaderFramework>();
 
             if (framework == null || _fade == null) return;
 
@@ -77,27 +70,6 @@ namespace CutsceneManager.Runtime
             if (_manager != null) _manager.LoadChapter(chapterId);
             else Debug.LogWarning("[MapLoaderBridge] MapLoaderManager not found.");
         }
-
-#else
-        // Stub when CUTSCENEMANAGER_MLF is not defined
-
-        private void Awake()
-        {
-            Debug.Log("[MapLoaderBridge] MapLoaderFramework integration is disabled. " +
-                      "Add the scripting define CUTSCENEMANAGER_MLF to enable it.");
-        }
-
-        /// <summary>No-op stub. Add CUTSCENEMANAGER_MLF scripting define to enable.</summary>
-        public void LoadMap(string mapId)
-        {
-            Debug.LogWarning("[MapLoaderBridge] LoadMap called but CUTSCENEMANAGER_MLF is not defined.");
-        }
-
-        /// <summary>No-op stub. Add CUTSCENEMANAGER_MLF scripting define to enable.</summary>
-        public void LoadChapter(int chapterId)
-        {
-            Debug.LogWarning("[MapLoaderBridge] LoadChapter called but CUTSCENEMANAGER_MLF is not defined.");
-        }
-#endif
     }
 }
+#endif
