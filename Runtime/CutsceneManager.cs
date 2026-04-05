@@ -80,6 +80,24 @@ namespace CutsceneManager.Runtime
         public Action StopAudioCallback;
 
         // -------------------------------------------------------------------------
+        // Video delegate hooks (set by CutsceneVideoBridge when VideoManager is present)
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Optional callback that handles <see cref="CutsceneStepType.PlayVideo"/> steps.
+        /// Signature: (resourceOrId). When set, the built-in single-step wait fallback is bypassed.
+        /// Set automatically by <c>VideoManager.Runtime.CutsceneVideoBridge</c>.
+        /// </summary>
+        public Action<string> PlayVideoCallback;
+
+        /// <summary>
+        /// Optional callback that handles <see cref="CutsceneStepType.StopVideo"/> steps.
+        /// When set, the built-in no-op fallback is bypassed.
+        /// Set automatically by <c>VideoManager.Runtime.CutsceneVideoBridge</c>.
+        /// </summary>
+        public Action StopVideoCallback;
+
+        // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
 
@@ -320,6 +338,14 @@ namespace CutsceneManager.Runtime
                 case CutsceneStepType.Custom:
                     OnCustomEvent?.Invoke(sequenceId, step.customEvent);
                     break;
+
+                case CutsceneStepType.PlayVideo:
+                    yield return HandlePlayVideo(step);
+                    break;
+
+                case CutsceneStepType.StopVideo:
+                    HandleStopVideo(step);
+                    break;
             }
         }
 
@@ -480,6 +506,35 @@ namespace CutsceneManager.Runtime
                 yield return null;
             }
             cam.transform.localPosition = originalPos;
+        }
+
+        private IEnumerator HandlePlayVideo(CutsceneStep step)
+        {
+            if (string.IsNullOrEmpty(step.videoResource))
+            {
+                Debug.LogWarning("[CutsceneManager] PlayVideo step has no videoResource set.");
+                yield break;
+            }
+
+            if (PlayVideoCallback != null)
+            {
+                // Delegate to VideoManager bridge — the bridge drives completion internally.
+                PlayVideoCallback(step.videoResource);
+                // Wait one frame so the video player can start before the next step executes.
+                yield return null;
+            }
+            else
+            {
+                Debug.Log($"[CutsceneManager] PlayVideo '{step.videoResource}': define VIDEOMANAGER_CSM and add CutsceneVideoBridge to enable VideoManager integration.");
+            }
+        }
+
+        private void HandleStopVideo(CutsceneStep step)
+        {
+            if (StopVideoCallback != null)
+                StopVideoCallback();
+            else
+                Debug.Log("[CutsceneManager] StopVideo: define VIDEOMANAGER_CSM and add CutsceneVideoBridge to enable VideoManager integration.");
         }
 
         // -------------------------------------------------------------------------

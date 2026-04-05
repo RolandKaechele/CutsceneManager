@@ -6,7 +6,7 @@ Sequences are defined in plain JSON, played back step-by-step at runtime, and op
 
 ## Features
 
-- **14 step types** — fade, wait, image slide, subtitle/dialogue, name card, audio, camera shake, map/chapter load, Lua trigger, custom events
+- **16 step types** — fade, wait, image slide, subtitle/dialogue, name card, audio, video (with SRT subtitles), camera shake, map/chapter load, Lua trigger, custom events
 - **JSON-authored sequences** — no code required to create or edit cutscenes
 - **Runtime hot-loading** — sequences in `persistentDataPath/Cutscenes/` are loaded at startup alongside bundled `Resources/Cutscenes/` files
 - **Skip support** — per-sequence `skipAllowed` flag; skip key is configurable (default: Escape)
@@ -112,7 +112,7 @@ Add `CutsceneTrigger` to any GameObject and set:
 
 ## Step Type Reference
 
-All 14 step types and the JSON properties each reads:
+All 16 step types and the JSON properties each reads:
 
 | Value | Name | Properties used |
 | ----- | ---- | --------------- |
@@ -130,6 +130,8 @@ All 14 step types and the JSON properties each reads:
 | 11 | `TriggerLua` | `luaScript` (script name without extension) |
 | 12 | `CameraShake` | `duration`, `shakeMagnitude` |
 | 13 | `Custom` | `customEvent` (arbitrary string) |
+| 14 | `PlayVideo` | `videoResource` (clip id or StreamingAssets path) |
+| 15 | `StopVideo` | *(none)* |
 
 ### Common Step Properties
 
@@ -149,6 +151,7 @@ All 14 step types and the JSON properties each reads:
 | `luaScript` | string | Script filename (without `.lua`) for `TriggerLua` |
 | `shakeMagnitude` | float | Shake intensity for `CameraShake` |
 | `customEvent` | string | Event name broadcast via `OnCustomEvent` |
+| `videoResource` | string | Registered VideoManager clip id or `StreamingAssets`-relative path for `PlayVideo` |
 
 
 ## MapLoaderFramework Integration
@@ -198,6 +201,8 @@ bridge.LoadChapter(3);
 | `OnCustomEvent` | `UnityEvent<string>` — fires on `Custom` steps |
 | `PlayAudioCallback` | `Action<string, bool>` delegate — override audio playback for `PlayAudio` steps |
 | `StopAudioCallback` | `Action` delegate — override audio stop for `StopAudio` steps |
+| `PlayVideoCallback` | `Action<string>` delegate — override video playback for `PlayVideo` steps |
+| `StopVideoCallback` | `Action` delegate — override video stop for `StopVideo` steps |
 
 ### `CutsceneTrigger`
 
@@ -261,6 +266,26 @@ Listens to `MiniGameManager.OnMiniGameStarted`, `OnMiniGameCompleted`, and `OnMi
 | `Start Suffix` | `"_start"` | e.g. `puzzle_01_start` plays when mini-game `puzzle_01` starts |
 | `Complete Suffix` | `"_complete"` | e.g. `puzzle_01_complete` plays on completion |
 | `Abort Suffix` | `"_abort"` | e.g. `puzzle_01_abort` plays on abort |
+
+
+## VideoManager Integration
+
+CutsceneManager exposes two delegate hooks so an external video system can handle `PlayVideo` (step 14) and `StopVideo` (step 15) steps through VideoManager.
+
+### Enable
+
+1. Install [VideoManager](https://github.com/RolandKaechele/VideoManager)
+2. Add `VIDEOMANAGER_CSM` to **Edit → Project Settings → Player → Scripting Define Symbols**
+3. Attach `CutsceneVideoBridge` to any GameObject in your scene
+
+`CutsceneVideoBridge.Awake()` wires `PlayVideoCallback` and `StopVideoCallback` automatically.
+
+### Example sequence steps
+
+```json
+{ "stepType": 14, "videoResource": "chapter01_intro" },
+{ "stepType": 15 }
+```
 
 
 ## AudioManager Integration
@@ -377,6 +402,7 @@ The `Examples/` folder contains ready-to-run sequences:
 | SaveManager | optional | Required when `CUTSCENEMANAGER_SM` is defined |
 | InventoryManager | optional | Required when `CUTSCENEMANAGER_IM` is defined |
 | MiniGameManager | optional | Required when `CUTSCENEMANAGER_MGM` is defined |
+| VideoManager | optional | Required when `VIDEOMANAGER_CSM` is defined |
 | AiManager | optional | Frozen by `AIMANAGER_CSM` bridge (on AiManager side) |
 | EnemyManager | optional | Spawning paused by `ENEMYMANAGER_CSM` bridge (on EnemyManager side) |
 | Odin Inspector | optional | Required when `ODIN_INSPECTOR` is defined |

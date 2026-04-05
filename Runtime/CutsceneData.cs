@@ -40,7 +40,11 @@ namespace CutsceneManager.Runtime
         /// <summary>Apply a camera-shake effect for the specified duration and magnitude.</summary>
         CameraShake,
         /// <summary>Broadcast a named custom event string on <see cref="CutsceneManager.OnCustomEvent"/>.</summary>
-        Custom
+        Custom,
+        /// <summary>Play a video clip with optional SRT subtitles via VideoManager (or built-in VideoPlayer fallback).</summary>
+        PlayVideo,
+        /// <summary>Stop the currently playing video.</summary>
+        StopVideo
     }
 
 
@@ -130,6 +134,14 @@ namespace CutsceneManager.Runtime
 
         /// <summary>Arbitrary event name broadcast via <see cref="CutsceneManager.OnCustomEvent"/>.</summary>
         public string customEvent;
+
+        // --- Video ---
+
+        /// <summary>
+        /// Registered VideoManager clip id or StreamingAssets-relative path (without extension).
+        /// Used by <see cref="CutsceneStepType.PlayVideo"/>.
+        /// </summary>
+        public string videoResource;
     }
 
 
