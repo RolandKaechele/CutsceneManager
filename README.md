@@ -18,6 +18,7 @@ Sequences are defined in plain JSON, played back step-by-step at runtime, and op
 - **Lua trigger step** — run named Lua scripts during a sequence (requires MapLoaderFramework with MoonSharp)
 - **Custom Inspector** — play, stop, and reload sequences from the Unity Editor
 - **Modular architecture** — each controller (fade, name card, subtitle) is a standalone component; use only what you need
+- **DOTween Pro integration** — `CanvasGroup.DOFade` and `RectTransform.DOMove` drive Fade step and subtitle slide-in/out tweens, replacing manual coroutines (activated via `CUTSCENEMANAGER_DOTWEEN`)
 - **Odin Inspector integration** — `SerializedMonoBehaviour` base for full Inspector serialization of complex types; runtime-display fields marked `[ReadOnly]` in Play Mode (activated via `ODIN_INSPECTOR`)
 
 
