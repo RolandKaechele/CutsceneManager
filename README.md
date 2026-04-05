@@ -377,6 +377,8 @@ The `Examples/` folder contains ready-to-run sequences:
 | SaveManager | optional | Required when `CUTSCENEMANAGER_SM` is defined |
 | InventoryManager | optional | Required when `CUTSCENEMANAGER_IM` is defined |
 | MiniGameManager | optional | Required when `CUTSCENEMANAGER_MGM` is defined |
+| AiManager | optional | Frozen by `AIMANAGER_CSM` bridge (on AiManager side) |
+| EnemyManager | optional | Spawning paused by `ENEMYMANAGER_CSM` bridge (on EnemyManager side) |
 | Odin Inspector | optional | Required when `ODIN_INSPECTOR` is defined |
 
 
