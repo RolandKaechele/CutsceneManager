@@ -465,20 +465,28 @@ namespace CutsceneManager.Runtime
 
         private void HandleTriggerMapLoad(CutsceneStep step)
         {
+#if CUTSCENEMANAGER_MLF
             var bridge = GetComponent<MapLoaderBridge>() ?? FindObjectOfType<MapLoaderBridge>();
             if (bridge != null && !string.IsNullOrEmpty(step.mapId))
                 bridge.LoadMap(step.mapId);
             else
                 Debug.LogWarning("[CutsceneManager] TriggerMapLoad: no MapLoaderBridge found or mapId is empty.");
+#else
+            Debug.LogWarning("[CutsceneManager] TriggerMapLoad: define CUTSCENEMANAGER_MLF scripting symbol to enable MapLoaderFramework integration.");
+#endif
         }
 
         private void HandleTriggerChapter(CutsceneStep step)
         {
+#if CUTSCENEMANAGER_MLF
             var bridge = GetComponent<MapLoaderBridge>() ?? FindObjectOfType<MapLoaderBridge>();
             if (bridge != null && step.chapterId > 0)
                 bridge.LoadChapter(step.chapterId);
             else
                 Debug.LogWarning("[CutsceneManager] TriggerChapter: no MapLoaderBridge found or chapterId is 0.");
+#else
+            Debug.LogWarning("[CutsceneManager] TriggerChapter: define CUTSCENEMANAGER_MLF scripting symbol to enable MapLoaderFramework integration.");
+#endif
         }
 
         private void HandleTriggerLua(CutsceneStep step)
